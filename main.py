@@ -1,6 +1,6 @@
 from config.settings import load_settings
 from clients.hubspot_client import fetch_companies
-from transformers.company_mapper import map_company
+from transformers.company_mapper import transform_company
 from clients.monday_client import upsert_company
 from state.checkpoint import load_checkpoint, save_checkpoint
 
@@ -24,7 +24,7 @@ def run_migration():
             break
 
         for company in companies:
-            mapped_company = map_company(company)
+            mapped_company = transform_company(company)
             upsert_company(mapped_company)
 
         save_checkpoint({"after": next_after})
