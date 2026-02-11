@@ -9,13 +9,13 @@ def run_migration():
     settings = load_settings()
 
     checkpoint = load_checkpoint()
-    offset = checkpoint.get("offset", 0)
+    after = checkpoint.get("after")
 
-    print(f"Starting migration from offset: {offset}")
+    print(f"Starting migration from cursor: {after}")
 
     while True:
-        companies, has_more = fetch_companies(
-            offset=offset,
+        companies, next_after = fetch_companies(
+            after=after,
             limit=settings["HUBSPOT_PAGE_LIMIT"]
         )
 
@@ -27,14 +27,15 @@ def run_migration():
             mapped_company = map_company(company)
             upsert_company(mapped_company)
 
-        offset += settings["HUBSPOT_PAGE_LIMIT"]
-        save_checkpoint({"offset": offset})
+        save_checkpoint({"after": next_after})
 
-        print(f"Processed batch. New offset: {offset}")
+        print(f"Processed batch. Next cursor: {next_after}")
 
-        if not has_more:
+        if not next_after:
             print("Reached end of HubSpot data.")
             break
+
+        after = next_after
 
     print("Migration completed successfully.")
 
