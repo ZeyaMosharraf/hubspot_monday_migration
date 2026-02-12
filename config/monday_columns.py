@@ -9,7 +9,3 @@ monday_company_columns = {
     "country": "text_mm0fv9q2",
     "Created_date": "date_mm0f7be1"
 }
-
-dropdown_columns = [
-    "industry"
-]

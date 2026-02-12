@@ -70,7 +70,11 @@ def upsert_company(company: dict):
         item_id = items[0]["id"]
         mutation = """
         mutation ($board_id: ID!, $item_id: ID!, $column_values: JSON!) {
-          change_multiple_column_values (board_id: $board_id, item_id: $item_id, column_values: $column_values) {
+          change_multiple_column_values (board_id: $board_id, 
+                                         item_id: $item_id, 
+                                         column_values: $column_values,
+                                         create_labels_if_missing: true
+                                         ) {
             id
           }
         }
@@ -83,7 +87,7 @@ def upsert_company(company: dict):
     else:
         mutation = """
         mutation ($board_id: ID!, $item_name: String!, $column_values: JSON!) {
-          create_item (board_id: $board_id, item_name: $item_name, column_values: $column_values) {
+          create_item (board_id: $board_id, item_name: $item_name, column_values: $column_values, create_labels_if_missing: true) {
             id
           }
         }
@@ -105,15 +109,3 @@ def upsert_company(company: dict):
         raise RuntimeError(f"Monday Mutation Error: {result['errors']}")
 
     return result
-
-if __name__ == "__main__":
-    dummy_company = {
-        "item_name": "TEST ACCOUNT SIMPLE",
-        "hubspot_id": "123456",
-        "phone": "555-0199",
-        "industry": "Software", 
-        "company_domain": "https://example.com"
-    }
-
-    result = upsert_company(dummy_company)
-    print(result)
