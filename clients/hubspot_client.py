@@ -1,5 +1,6 @@
 import requests
 from config.settings import load_settings
+from config.hubspot_columns import hubspot_properties
 
 def fetch_companies(after: str | None, limit: int):
     
@@ -7,6 +8,9 @@ def fetch_companies(after: str | None, limit: int):
 
     if not settings.get("HUBSPOT_ACCESS_TOKEN"):
         raise RuntimeError("HUBSPOT_ACCESS_TOKEN is missing")
+
+    if not hubspot_properties:
+        raise RuntimeError("HUBSPOT_COMPANY_PROPERTIES is empty")
 
     url = "https://api.hubapi.com/crm/v3/objects/companies"
 
@@ -16,7 +20,8 @@ def fetch_companies(after: str | None, limit: int):
     }
 
     params = {
-        "limit": limit
+        "limit": limit,
+        "properties": hubspot_properties
     }
 
     if after:

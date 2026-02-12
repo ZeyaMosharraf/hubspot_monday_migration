@@ -3,13 +3,13 @@ from clients.hubspot_client import fetch_companies
 from transformers.company_mapper import transform_company
 from clients.monday_client import upsert_company
 from state.checkpoint import load_checkpoint, save_checkpoint
-
+from config.monday_columns import monday_company_columns, dropdown_columns
+from schema.monday_schema import alter_dropdown_add_label
 
 def run_migration():
     settings = load_settings()
 
-    checkpoint = load_checkpoint()
-    after = checkpoint.get("after")
+    after = load_checkpoint()
 
     print(f"Starting migration from cursor: {after}")
 
@@ -23,8 +23,24 @@ def run_migration():
             print("No more companies to process.")
             break
 
+        mapped_companies = []
+        dropdown_values = {col: set() for col in dropdown_columns}
+
         for company in companies:
             mapped_company = transform_company(company)
+            mapped_companies.append(mapped_company)
+
+            for col in dropdown_columns:
+                if mapped_company.get(col):
+                    dropdown_values[col].add(mapped_company[col])
+
+        for semantic_col, values in dropdown_values.items():
+            column_id = monday_company_columns[semantic_col]
+
+            for value in values:
+                alter_dropdown_add_label(column_id, value)
+
+        for mapped_company in mapped_companies:
             upsert_company(mapped_company)
 
         save_checkpoint({"after": next_after})

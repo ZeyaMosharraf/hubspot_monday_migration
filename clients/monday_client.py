@@ -105,3 +105,15 @@ def upsert_company(company: dict):
         raise RuntimeError(f"Monday Mutation Error: {result['errors']}")
 
     return result
+
+if __name__ == "__main__":
+    dummy_company = {
+        "item_name": "TEST ACCOUNT SIMPLE",
+        "hubspot_id": "123456",
+        "phone": "555-0199",
+        "industry": "Software", 
+        "company_domain": "https://example.com"
+    }
+
+    result = upsert_company(dummy_company)
+    print(result)

@@ -3,6 +3,13 @@
 monday_company_columns = {
     "hubspot_id": "text_mm0ewegj",
     "phone": "text_mm0e2zwv",
-    "industry": "industry",
-    "company_domain": "company_domain"
+    "industry": "dropdown_mm0fx1gn",
+    "company_domain": "company_domain",
+    "city": "text_mm0fh1e0",
+    "country": "text_mm0fv9q2",
+    "Created_date": "date_mm0f7be1"
 }
+
+dropdown_columns = [
+    "industry"
+]
