@@ -13,31 +13,16 @@ def transform_company(hubspot_company: dict) -> dict:
         except Exception:
             formatted_date = None
 
-    return {
-        "hubspot_id": hubspot_company.get("id"),
-        "item_name": props.get("name"),
-        "phone": props.get("phone"),
-        "industry": props.get("industry"),
-        "company_domain": props.get("domain"),
-        "city": props.get("city"),
-        "country": props.get("country"),
-        "Created_date": formatted_date
-    }
-
-
-# if __name__ == "__main__":
-#     sample = {
-#         "id": "123",
-#         "properties": {
-#             "name": "Test Company",
-#             "phone": "999999",
-#             "industry": "Software",
-#             "domain": "example.com",
-#             "city": "Delhi",
-#             "country": "India",
-#             "createdate": "2026-02-03T09:03:12.137Z"
-#         }
-#     }
-
-#     result = transform_company(sample)
-#     print(result)
+        return {
+            "item_name": props.get("name"),
+            "unique_value": hubspot_company.get("id"),
+            "columns": {
+                "hubspot_id": hubspot_company.get("id"),
+                "phone": props.get("phone"),
+                "industry": props.get("industry"),
+                "company_domain": props.get("domain"),
+                "city": props.get("city"),
+                "country": props.get("country"),
+                "created_date": props.get("createdate")
+            }
+        }

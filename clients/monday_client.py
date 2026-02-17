@@ -26,6 +26,9 @@ def upsert_company(company: dict):
         monday_company_columns["hubspot_id"]: str(company.get("hubspot_id")) if company.get("hubspot_id") else None,
         monday_company_columns["phone"]: company.get("phone"),
         monday_company_columns["industry"]: company.get("industry"),
+        monday_company_columns["city"]: company.get("city"),
+        monday_company_columns["country"]: company.get("country"),
+        monday_company_columns["Created_date"]: company.get("Created_date"),
         monday_company_columns["company_domain"]: (
             {
                 "url": company["company_domain"],
@@ -40,7 +43,9 @@ def upsert_company(company: dict):
 
     search_query = """
     query ($board_id: ID!, $column_id: String!, $value: [String]!) {
-      items_page_by_column_values (board_id: $board_id, columns: [{column_id: $column_id, column_values: $value}]) {
+      items_page_by_column_values (board_id: $board_id, 
+                                   columns: [{column_id: $column_id, 
+                                    column_values: $value}]) {
         items {
           id
         }
@@ -56,8 +61,10 @@ def upsert_company(company: dict):
 
     search_response = requests.post(url, 
                                     headers=headers, 
-                                    json={"query": search_query, "variables": search_vars}, 
+                                    json={"query": search_query, 
+                                          "variables": search_vars}, 
                                     timeout=30)
+    
     search_response.raise_for_status()
     search_data = search_response.json()
 
@@ -87,7 +94,10 @@ def upsert_company(company: dict):
     else:
         mutation = """
         mutation ($board_id: ID!, $item_name: String!, $column_values: JSON!) {
-          create_item (board_id: $board_id, item_name: $item_name, column_values: $column_values, create_labels_if_missing: true) {
+          create_item (board_id: $board_id, 
+                       item_name: $item_name, 
+                       column_values: $column_values, 
+                       create_labels_if_missing: true) {
             id
           }
         }

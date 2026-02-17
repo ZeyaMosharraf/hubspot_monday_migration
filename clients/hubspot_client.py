@@ -2,7 +2,7 @@ import requests
 from config.settings import load_settings
 from config.hubspot_columns import hubspot_properties
 
-def fetch_companies(after: str | None, limit: int):
+def fetch_object(object_type: str, properties: list[str], after: str | None, limit: int):
     
     settings = load_settings()
 
@@ -10,9 +10,9 @@ def fetch_companies(after: str | None, limit: int):
         raise RuntimeError("HUBSPOT_ACCESS_TOKEN is missing")
 
     if not hubspot_properties:
-        raise RuntimeError("HUBSPOT_COMPANY_PROPERTIES is empty")
+        raise RuntimeError("HUBSPOT_OBJECT_PROPERTIES is empty")
 
-    url = "https://api.hubapi.com/crm/v3/objects/companies"
+    url = f"https://api.hubapi.com/crm/v3/objects/{object_type}"
 
     headers = {
         "Authorization": f"Bearer {settings['HUBSPOT_ACCESS_TOKEN']}",
@@ -21,7 +21,7 @@ def fetch_companies(after: str | None, limit: int):
 
     params = {
         "limit": limit,
-        "properties": hubspot_properties
+        "properties": ",".join(hubspot_properties)
     }
 
     if after:
@@ -37,9 +37,9 @@ def fetch_companies(after: str | None, limit: int):
 
     data = response.json()
 
-    companies = data.get("results", [])
+    hubspot_result = data.get("results", [])
 
     paging = data.get("paging", {})
     next_after = paging.get("next", {}).get("after")
 
-    return companies, next_after
+    return hubspot_result, next_after
