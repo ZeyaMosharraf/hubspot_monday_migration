@@ -23,6 +23,6 @@ def transform_company(hubspot_company: dict) -> dict:
                 "company_domain": props.get("domain"),
                 "city": props.get("city"),
                 "country": props.get("country"),
-                "created_date": props.get("createdate")
+                "created_date": formatted_date
             }
         }
