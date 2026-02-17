@@ -34,3 +34,4 @@ Thumbs.db
 # State / checkpoint files
 checkpoint.json
 state.json
+sandbox_test.py

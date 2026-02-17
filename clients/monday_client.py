@@ -4,7 +4,7 @@ import time
 from config.settings import load_settings
 from config.monday_columns import monday_company_columns
 
-def upsert_company(company: dict):
+def upsert_item(board_id: str, unique_column_id: str, column_mapping: dict, item_data: dict):
     settings = load_settings()
 
     token = settings.get("MONDAY_API_TOKEN")
@@ -22,22 +22,24 @@ def upsert_company(company: dict):
         "API-Version": "2023-10"
     }
 
-    column_values = {
-        monday_company_columns["hubspot_id"]: str(company.get("hubspot_id")) if company.get("hubspot_id") else None,
-        monday_company_columns["phone"]: company.get("phone"),
-        monday_company_columns["industry"]: company.get("industry"),
-        monday_company_columns["city"]: company.get("city"),
-        monday_company_columns["country"]: company.get("country"),
-        monday_company_columns["Created_date"]: company.get("Created_date"),
-        monday_company_columns["company_domain"]: (
-            {
-                "url": company["company_domain"],
-                "text": company["company_domain"].replace("https://", "").replace("http://", "")
+    column_values = {}
+
+    for key, value in item_data["columns"].items():
+        if value is None:
+            continue
+
+        column_id = column_mapping.get(key)
+
+        if not column_id:
+            continue
+
+        if key.endswith("_domain"):
+            column_values[column_id] = {
+                "url": value,
+                "text": value.replace("https://", "").replace("http://", "")
             }
-            if company.get("company_domain")
-            else None
-        )
-    }
+        else:
+            column_values[column_id] = value
 
     column_values = {k: v for k, v in column_values.items() if v is not None}
 
@@ -55,8 +57,8 @@ def upsert_company(company: dict):
     
     search_vars = {
         "board_id": board_id,
-        "column_id": monday_company_columns["hubspot_id"],
-        "value": [str(company.get("hubspot_id"))]
+        "column_id": unique_column_id,
+        "value": [str(item_data["unique_value"])]
     }
 
     search_response = requests.post(url, 
@@ -104,7 +106,7 @@ def upsert_company(company: dict):
         """
         variables = {
             "board_id": board_id,
-            "item_name": company.get("item_name", "New Company"),
+            "item_name": item_data.get("item_name") or "Unnamed Item",
             "column_values": json.dumps(column_values)
         }
 

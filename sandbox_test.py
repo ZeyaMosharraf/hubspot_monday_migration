@@ -1,21 +1,33 @@
-from clients.hubspot_client import fetch_object
-from config.hubspot_columns import hubspot_properties
 from config.settings import load_settings
+from config.monday_columns import monday_company_columns
+from clients.monday_client import upsert_item
 
 
 def run_test():
     settings = load_settings()
 
-    hubspot_result, next_after = fetch_object(
-        object_type="2-54742785",
-        properties=hubspot_properties,
-        after=None, 
-        limit=20
+    dummy = {
+        "item_name": "Universal Test",
+        "unique_value": "999999",
+        "columns": {
+            "hubspot_id": "999999",
+            "phone": "12345",
+            "industry": "Software",
+            "company_domain": "https://example.com",
+            "city": "Delhi",
+            "country": "India",
+            "created_date": "2025-12-18"
+        }
+    }
+
+    response = upsert_item(
+        board_id=settings["MONDAY_COMPANY_BOARD_ID"],
+        unique_column_id=monday_company_columns["hubspot_id"],
+        column_mapping=monday_company_columns,
+        item_data=dummy
     )
 
-    print("Fetched:", len(hubspot_result))
-    print("Next cursor:", next_after)
-    print("First record:", hubspot_result[0] if hubspot_result else None)
+    print(response)
 
 
 if __name__ == "__main__":
