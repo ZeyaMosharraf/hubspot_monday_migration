@@ -27,7 +27,9 @@ def fetch_object(object_type: str, properties: list[str], after: str | None, lim
     if after:
         params["after"] = after
 
-    response = requests.get(
+    session = requests.Session()
+
+    response = session.get(
         url,
         headers=headers,
         params=params,
